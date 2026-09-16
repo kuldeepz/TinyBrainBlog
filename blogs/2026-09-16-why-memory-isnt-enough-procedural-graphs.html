@@ -3,222 +3,380 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Why Memory Isn't Enough: Structuring AI Agents with Procedural Graphs</title>
+  <title>Why Memory Isn't Enough: Structuring AI Agents with Procedural Graphs | TinyBrain</title>
   <meta name="description" content="Discover why vector memory and large context windows fail on complex workflows and how self-evolving procedural graphs solve long-horizon AI agent reliability.">
   <meta name="keywords" content="AI Agents, Procedural Graphs, LLM Architecture, Machine Learning, Autonomous Workflows">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-primary: #0d1117;
-      --bg-secondary: #161b22;
-      --bg-tertiary: #21262d;
-      --text-main: #e6edf3;
-      --text-muted: #8b949e;
-      --accent-cyan: #58a6ff;
-      --accent-purple: #bc8cff;
-      --accent-green: #3fb950;
-      --accent-orange: #d29922;
-      --border-color: #30363d;
-      --code-bg: #090d13;
+      --bg-base: #0a0d14;
+      --bg-surface: #111622;
+      --bg-card: #151b29;
+      --border-subtle: #20293d;
+      --border-highlight: #33415e;
+      --text-primary: #f0f4fc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --accent-blue: #38bdf8;
+      --accent-indigo: #818cf8;
+      --accent-violet: #a855f7;
+      --accent-emerald: #10b981;
+      --code-bg: #070a10;
     }
+
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
+
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      line-height: 1.7;
-      color: var(--text-main);
-      background-color: var(--bg-primary);
-      padding: 2rem 1rem;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.75;
+      color: var(--text-primary);
+      background-color: var(--bg-base);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
     }
-    .container {
-      max-width: 860px;
+
+    body::before {
+      content: '';
+      position: absolute;
+      top: -150px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 900px;
+      height: 450px;
+      background: radial-gradient(ellipse at center, rgba(56, 189, 248, 0.1), rgba(168, 85, 247, 0.05), transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .wrapper {
+      max-width: 840px;
       margin: 0 auto;
-      background: var(--bg-secondary);
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 3rem 2.5rem;
-      box-shadow: 0 12px 32px rgba(0,0,0,0.5);
+      padding: 0 1.5rem;
+      width: 100%;
+      position: relative;
+      z-index: 1;
     }
-    header {
-      border-bottom: 1px solid var(--border-color);
-      padding-bottom: 2rem;
+
+    /* Top Nav */
+    header.post-header-nav {
+      padding: 2rem 0 1.5rem;
+      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: color 0.2s ease;
+    }
+
+    .back-link:hover {
+      color: var(--accent-blue);
+    }
+
+    .brand-mini {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    /* Article Header */
+    article header {
       margin-bottom: 2.5rem;
     }
-    .badge {
+
+    .category-badge {
       display: inline-block;
       font-size: 0.75rem;
       text-transform: uppercase;
-      letter-spacing: 1px;
+      letter-spacing: 0.08em;
       font-weight: 700;
-      color: var(--accent-cyan);
-      background: rgba(88, 166, 255, 0.12);
-      padding: 4px 10px;
+      color: var(--accent-blue);
+      background: rgba(56, 189, 248, 0.1);
+      padding: 5px 12px;
       border-radius: 20px;
-      margin-bottom: 1rem;
-      border: 1px solid rgba(88, 166, 255, 0.3);
+      margin-bottom: 1.25rem;
+      border: 1px solid rgba(56, 189, 248, 0.25);
     }
-    h1 {
-      font-size: 2.25rem;
+
+    h1.post-title {
+      font-size: 2.5rem;
       line-height: 1.25;
       font-weight: 800;
       color: #ffffff;
-      margin-bottom: 1rem;
-      letter-spacing: -0.5px;
+      margin-bottom: 1.25rem;
+      letter-spacing: -0.03em;
     }
-    .subtitle {
-      font-size: 1.15rem;
-      color: var(--accent-purple);
+
+    .post-dek {
+      font-size: 1.2rem;
+      color: var(--text-secondary);
       font-style: italic;
-      line-height: 1.5;
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
     }
-    .meta-bar {
-      margin-top: 1.25rem;
+
+    .post-meta-bar {
       display: flex;
-      gap: 1.5rem;
+      align-items: center;
+      gap: 1.25rem;
       font-size: 0.85rem;
       color: var(--text-muted);
+      border-top: 1px solid var(--border-subtle);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 0.85rem 0;
+      margin-bottom: 2.5rem;
     }
-    h2 {
-      font-size: 1.5rem;
+
+    /* Article Typography */
+    .article-body {
+      font-size: 1.08rem;
+    }
+
+    .article-body p {
+      margin-bottom: 1.5rem;
+      color: #cbd5e1;
+    }
+
+    .article-body strong {
+      color: #ffffff;
+    }
+
+    .article-body h2 {
+      font-size: 1.65rem;
       font-weight: 700;
       color: #ffffff;
-      margin: 2.5rem 0 1rem;
+      margin: 3rem 0 1.25rem;
+      letter-spacing: -0.02em;
       padding-bottom: 0.5rem;
-      border-bottom: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--border-subtle);
     }
-    h3 {
-      font-size: 1.2rem;
+
+    .article-body h3 {
+      font-size: 1.25rem;
       font-weight: 600;
-      color: var(--accent-cyan);
-      margin: 1.75rem 0 0.75rem;
+      color: var(--accent-blue);
+      margin: 2rem 0 0.85rem;
     }
-    p {
-      margin-bottom: 1.25rem;
-      font-size: 1.05rem;
+
+    .article-body ul {
+      margin: 1rem 0 1.75rem 1.5rem;
     }
-    strong {
-      color: #ffffff;
+
+    .article-body li {
+      margin-bottom: 0.75rem;
+      color: #cbd5e1;
     }
-    ul, ol {
-      margin: 1rem 0 1.5rem 1.5rem;
-    }
-    li {
-      margin-bottom: 0.6rem;
-    }
+
     pre {
       background-color: var(--code-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 1.25rem;
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 1.35rem;
       overflow-x: auto;
-      margin: 1.5rem 0;
-      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, monospace;
-      font-size: 0.9rem;
-      line-height: 1.5;
-      color: #79c0ff;
+      margin: 2rem 0;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.88rem;
+      line-height: 1.55;
+      color: #93c5fd;
     }
+
     code {
-      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, monospace;
-      background-color: var(--bg-tertiary);
+      font-family: 'JetBrains Mono', monospace;
+      background-color: rgba(255, 255, 255, 0.06);
       padding: 2px 6px;
       border-radius: 4px;
       font-size: 0.9em;
-      color: var(--accent-cyan);
+      color: var(--accent-blue);
     }
+
     pre code {
       background-color: transparent;
       padding: 0;
       color: inherit;
     }
+
     .table-container {
       overflow-x: auto;
-      margin: 1.5rem 0;
+      margin: 2rem 0;
     }
+
     table {
       width: 100%;
       border-collapse: collapse;
       text-align: left;
       font-size: 0.95rem;
     }
+
     th, td {
-      padding: 10px 14px;
-      border: 1px solid var(--border-color);
+      padding: 12px 16px;
+      border: 1px solid var(--border-subtle);
     }
+
     th {
-      background-color: var(--bg-tertiary);
+      background-color: var(--bg-surface);
       color: #ffffff;
       font-weight: 600;
     }
+
     td {
-      background-color: var(--bg-secondary);
+      background-color: var(--bg-card);
+      color: #cbd5e1;
     }
-    blockquote {
-      border-left: 4px solid var(--accent-cyan);
-      background: rgba(88, 166, 255, 0.08);
-      padding: 1rem 1.25rem;
-      border-radius: 0 8px 8px 0;
-      margin: 1.5rem 0;
-      font-style: italic;
-      color: #c9d1d9;
-    }
+
     a {
-      color: var(--accent-cyan);
+      color: var(--accent-blue);
       text-decoration: none;
+      transition: color 0.2s ease;
     }
+
     a:hover {
       text-decoration: underline;
+      color: #60a5fa;
     }
-    hr {
-      border: none;
-      border-top: 1px solid var(--border-color);
-      margin: 3rem 0 2rem;
+
+    /* Article Footer Card */
+    .article-footer {
+      margin-top: 4rem;
+      padding-top: 2.5rem;
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1.5rem;
     }
-    .publishing-pack {
-      background-color: var(--bg-tertiary);
-      border-radius: 8px;
-      padding: 1.5rem;
-      margin-top: 2rem;
-      border: 1px solid var(--border-color);
+
+    .tag-list {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
     }
-    .publishing-pack h3 {
-      margin-top: 0;
-      color: var(--accent-orange);
-    }
-    .verdict-badge {
-      display: inline-block;
-      padding: 4px 12px;
-      background: rgba(63, 185, 80, 0.15);
-      border: 1px solid var(--accent-green);
-      color: var(--accent-green);
-      font-weight: 700;
+
+    .tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      padding: 4px 10px;
       border-radius: 6px;
-      margin-bottom: 1rem;
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .btn-return {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.6rem 1.25rem;
+      border-radius: 8px;
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      border: 1px solid var(--border-highlight);
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .btn-return:hover {
+      background: var(--border-highlight);
+      text-decoration: none;
+      border-color: var(--accent-blue);
+    }
+
+    /* Site Footer */
+    footer.site-footer {
+      margin-top: 5rem;
+      border-top: 1px solid var(--border-subtle);
+      padding: 2.5rem 0;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 1.5rem;
+    }
+
+    .footer-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+    }
+
+    .footer-links a:hover {
+      color: var(--accent-blue);
+    }
+
+    @media (max-width: 768px) {
+      h1.post-title {
+        font-size: 1.9rem;
+      }
+      .post-dek {
+        font-size: 1.05rem;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <span class="badge">Architecture & Systems</span>
-      <h1>Why Memory Isn't Enough: Structuring AI Agents with Procedural Graphs</h1>
-      <p class="subtitle">Giving autonomous agents larger context windows and vector retrieval stores only solves declarative recall. Reliable long-horizon execution demands an executable topology of operations.</p>
-      <div class="meta-bar">
-        <span>Published: September 16, 2026</span>
-        <span>Reading Time: 7 min</span>
-        <span>Focus: Autonomous Agents &amp; Procedural Topology</span>
-      </div>
+  <div class="wrapper">
+    <!-- Top Nav -->
+    <header class="post-header-nav">
+      <a href="../index.html" class="back-link">&larr; Back to all publications</a>
+      <a href="../index.html" class="brand-mini">
+        <span>🧠</span> TinyBrain
+      </a>
     </header>
 
-    <main>
-      <p>For the past two years, the default playbook for improving autonomous AI agents has focused almost entirely on memory: scaling context windows to millions of tokens, attaching dense vector embeddings for RAG retrieval, and stacking episodic reflection buffers. Yet across enterprise deployments, long-running agent workflows continue to break down. As task trajectories grow in length and complexity, language models reliably drift from high-level objectives, call tools out of operational sequence, and fall into repetitive recovery loops.</p>
+    <article>
+      <header>
+        <span class="category-badge">Architecture &amp; Systems</span>
+        <h1 class="post-title">Why Memory Isn't Enough: Structuring AI Agents with Procedural Graphs</h1>
+        <p class="post-dek">Giving autonomous agents larger context windows and vector retrieval stores only solves declarative recall. Reliable long-horizon execution demands an executable topology of operations.</p>
+        <div class="post-meta-bar">
+          <span>Published: September 16, 2026</span>
+          <span>&middot;</span>
+          <span>7 min read</span>
+          <span>&middot;</span>
+          <span>Focus: Autonomous Agents &amp; Procedural Topology</span>
+        </div>
+      </header>
 
-      <p>The breakdown is not caused by a failure of semantic memory. It is caused by an absence of <strong>procedural structure</strong>.</p>
+      <div class="article-body">
+        <p>For the past two years, the default playbook for improving autonomous AI agents has focused almost entirely on memory: scaling context windows to millions of tokens, attaching dense vector embeddings for semantic retrieval, and stacking episodic reflection buffers. Yet across enterprise deployments, long-running agent workflows continue to break down. As task trajectories grow in length and complexity, language models reliably drift from high-level objectives, call tools out of operational sequence, and fall into repetitive recovery loops.</p>
 
-      <p>While semantic retrieval answers <em>"what information is relevant,"</em> it remains completely blind to <em>"what step must be taken next, under what strict prerequisites, and along which valid state transition."</em> Knowledge graphs solved this dilemma for world states by organizing facts into declarative triplets. For reliable, long-horizon operational execution, autonomous systems require the functional counterpart: <strong>Procedural Graphs</strong>.</p>
+        <p>The breakdown is not caused by a failure of semantic memory. It is caused by an absence of <strong>procedural structure</strong>.</p>
 
-      <pre><code>+--------------------------------------------------------------------------+
+        <p>While semantic retrieval answers <em>"what information is relevant,"</em> it remains completely blind to <em>"what step must be taken next, under what strict prerequisites, and along which valid state transition."</em> Knowledge graphs solved this dilemma for world states by organizing facts into declarative triplets. For reliable, long-horizon operational execution, autonomous systems require the functional counterpart: <strong>Procedural Graphs</strong>.</p>
+
+        <pre><code>+--------------------------------------------------------------------------+
 |            DECLARATIVE KNOWLEDGE VS. PROCEDURAL KNOWLEDGE                |
 +--------------------------------------------------------------------------+
 
@@ -230,89 +388,89 @@
   [ Check Visa ] --(requires_valid)--&gt; [ Search Flights ] --(then)--&gt; [ Compare Fares ]
   Triplets: (Action, Constraint / Transition, Action) -&gt; Answers "How to execute"</code></pre>
 
-      <h2>The Semantic Deficit: Why Memory Scaling Degrades Trajectories</h2>
+        <h2>The Semantic Deficit: Why Memory Scaling Degrades Trajectories</h2>
 
-      <p>Most contemporary AI agents rely on unconstrained next-token generation over a monotonic, linear interaction history. In this paradigm, workflow rules, business constraints, and operational dependencies are left implicit—buried deep within initial system prompts or historical conversation traces.</p>
+        <p>Most contemporary AI agents rely on unconstrained next-token generation over a monotonic, linear interaction history. In this paradigm, workflow rules, business constraints, and operational dependencies are left implicit—buried deep within initial system prompts or historical conversation traces.</p>
 
-      <p>As execution steps compound, this implicit paradigm triggers three predictable failure modes:</p>
+        <p>As execution steps compound, this implicit paradigm triggers three predictable failure modes:</p>
 
-      <ul>
-        <li><strong>Trajectory Drift:</strong> As conversation histories fill with verbose JSON payloads, tool errors, and intermediary reasoning tokens, cross-attention spreads thin. The model loses track of the global milestone roadmap and prioritizes local token artifacts.</li>
-        <li><strong>State Confusion:</strong> Generative agents frequently hallucinate prerequisite satisfaction. If an action or parameter was discussed or hypothesized earlier in the context window, the model frequently mistakes conversational mentions for verified environmental execution.</li>
-        <li><strong>Degenerate Loop Fixation:</strong> When an external tool call yields an error or unexpected output, purely generative systems lack hard topological constraints that forbid re-entering the identical failed state. Consequently, agents re-issue identical or cosmetically mutated API calls indefinitely.</li>
-      </ul>
+        <ul>
+          <li><strong>Trajectory Drift:</strong> As conversation histories fill with verbose JSON payloads, tool errors, and intermediary reasoning tokens, cross-attention spreads thin. The model loses track of the global milestone roadmap and prioritizes local token artifacts.</li>
+          <li><strong>State Confusion:</strong> Generative agents frequently hallucinate prerequisite satisfaction. If an action or parameter was discussed or hypothesized earlier in the context window, the model frequently mistakes conversational mentions for verified environmental execution.</li>
+          <li><strong>Degenerate Loop Fixation:</strong> When an external tool call yields an error or unexpected output, purely generative systems lack hard topological constraints that forbid re-entering the identical failed state. Consequently, agents re-issue identical or cosmetically mutated API calls indefinitely.</li>
+        </ul>
 
-      <p>Where knowledge graphs formalize declarative entities into structured, queryable networks, procedural graphs do the same for operational execution by structuring workflows as <code>(procedure, relation, procedure)</code> triplets.</p>
+        <p>Where knowledge graphs formalize declarative entities into structured, queryable networks, procedural graphs do the same for operational execution by structuring workflows as <code>(procedure, relation, procedure)</code> triplets.</p>
 
-      <h2>Declarative Graphs vs. Procedural Graphs: The Fundamental Divide</h2>
+        <h2>Declarative Graphs vs. Procedural Graphs: The Fundamental Divide</h2>
 
-      <p>To understand why vector databases cannot substitute for execution graphs, consider how each paradigm represents domain information:</p>
+        <p>To understand why vector databases cannot substitute for execution graphs, consider how each paradigm represents domain information:</p>
 
-      <ul>
-        <li><strong>Declarative Knowledge Graphs</strong> map entities and relational facts (<code>Entity -&gt; Relation -&gt; Entity</code>). They model world invariants (e.g., <em>"Company X" -&gt; "acquired" -&gt; "Startup Y"</em>).</li>
-        <li><strong>Procedural Graphs</strong> map operational states, prerequisites, and transitions (<code>Action -&gt; Constraint / Transition -&gt; Action</code>). They model dynamic paths of action (e.g., <em>"Draft Schema" -&gt; "requires_linter_pass" -&gt; "Deploy Migration"</em>).</li>
-      </ul>
+        <ul>
+          <li><strong>Declarative Knowledge Graphs</strong> map entities and relational facts (<code>Entity -&gt; Relation -&gt; Entity</code>). They model world invariants (e.g., <em>"Company X" -&gt; "acquired" -&gt; "Startup Y"</em>).</li>
+          <li><strong>Procedural Graphs</strong> map operational states, prerequisites, and transitions (<code>Action -&gt; Constraint / Transition -&gt; Action</code>). They model dynamic paths of action (e.g., <em>"Draft Schema" -&gt; "requires_linter_pass" -&gt; "Deploy Migration"</em>).</li>
+        </ul>
 
-      <div class="table-container">
-        <table>
-          <thead>
-            <tr>
-              <th>Architecture Paradigm</th>
-              <th>State Representation</th>
-              <th>Action Routing Method</th>
-              <th>Adaptability vs. Governance</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>Pure ReAct</strong></td>
-              <td>Flat token interaction log</td>
-              <td>Implicit / Next-token generation</td>
-              <td>High adaptability, high failure risk</td>
-            </tr>
-            <tr>
-              <td><strong>Hardcoded FSM / DAG</strong></td>
-              <td>Rigid state machine nodes</td>
-              <td>Deterministic condition checks</td>
-              <td>Zero adaptability, brittle to edge cases</td>
-            </tr>
-            <tr>
-              <td><strong>Procedural Graph</strong></td>
-              <td>Topological subgraph state</td>
-              <td>Dynamic prompt prior &amp; local bias</td>
-              <td>Adaptive reasoning with formal boundaries</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Architecture Paradigm</th>
+                <th>State Representation</th>
+                <th>Action Routing Method</th>
+                <th>Adaptability vs. Governance</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Pure ReAct</strong></td>
+                <td>Flat token interaction log</td>
+                <td>Implicit / Next-token generation</td>
+                <td>High adaptability, high failure risk</td>
+              </tr>
+              <tr>
+                <td><strong>Hardcoded FSM / DAG</strong></td>
+                <td>Rigid state machine nodes</td>
+                <td>Deterministic condition checks</td>
+                <td>Zero adaptability, brittle to edge cases</td>
+              </tr>
+              <tr>
+                <td><strong>Procedural Graph</strong></td>
+                <td>Topological subgraph state</td>
+                <td>Dynamic prompt prior &amp; local bias</td>
+                <td>Adaptive reasoning with formal boundaries</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
-      <h2>How Procedural Graphs Guide Execution Without Brittle Constraints</h2>
+        <h2>How Procedural Graphs Guide Execution Without Brittle Constraints</h2>
 
-      <p>Traditional software engineering enforces procedure through hard-coded finite state machines (FSMs) or rigid directed acyclic graphs (DAGs). However, hardcoding deterministic transitions sacrifices the primary advantage of modern language models: adaptive problem-solving when confronting unfamiliar edge cases.</p>
+        <p>Traditional software engineering enforces procedure through hard-coded finite state machines (FSMs) or rigid directed acyclic graphs (DAGs). However, hardcoding deterministic transitions sacrifices the primary advantage of modern language models: adaptive problem-solving when confronting unfamiliar edge cases.</p>
 
-      <p>Procedural graphs preserve model flexibility through a three-part runtime architecture:</p>
+        <p>Procedural graphs preserve model flexibility through a three-part runtime architecture:</p>
 
-      <h3>1. Situational Guidance as Dynamic Prompt Biasing</h3>
-      <p>Rather than hard-locking an agent into an unyielding state transition, the engine continuously tracks the agent's current node within the procedural graph. At every decision boundary, it extracts the immediate neighborhood—the active local subgraph containing valid next actions, parameter constraints, and fallback branches.</p>
-      <p>This localized subgraph is synthesized into concise <strong>situational guidance</strong> and injected into the prompt as a structured prior. The model is strongly biased toward proven operational steps while retaining full agency to break away and improvise if unforeseen real-world conditions invalidate the default path.</p>
+        <h3>1. Situational Guidance as Dynamic Prompt Biasing</h3>
+        <p>Rather than hard-locking an agent into an unyielding state transition, the engine continuously tracks the agent's current node within the procedural graph. At every decision boundary, it extracts the immediate neighborhood—the active local subgraph containing valid next actions, parameter constraints, and fallback branches.</p>
+        <p>This localized subgraph is synthesized into concise <strong>situational guidance</strong> and injected into the prompt as a structured prior. The model is strongly biased toward proven operational steps while retaining full agency to break away and improvise if unforeseen real-world conditions invalidate the default path.</p>
 
-      <h3>2. Closed-Loop Self-Evolution with Validation Gates</h3>
-      <p>Static operational workflows rot quickly as external APIs evolve, error formats shift, and business rules change. Procedural graphs eliminate manual maintenance by continuously learning from trajectory histories:</p>
-      <ul>
-        <li><strong>Differential Trajectory Analysis:</strong> A dedicated offline refiner compares successful execution traces against failed trajectories, pinpointing exact nodes where execution diverged, prerequisites were omitted, or transitions dead-ended.</li>
-        <li><strong>Gated Validation Harness:</strong> Structural graph updates (adding nodes, altering prerequisite edge attributes) are never pushed directly to production. Candidate topologies are evaluated against a held-out test suite. Only modifications that maintain or increase benchmark success rates are merged.</li>
-        <li><strong>Rejection Memory:</strong> Modifications that degrade benchmark performance are logged to an immutable exclusion register, preventing the system from ever re-attempting counterproductive graph refactorings.</li>
-      </ul>
+        <h3>2. Closed-Loop Self-Evolution with Validation Gates</h3>
+        <p>Static operational workflows rot quickly as external APIs evolve, error formats shift, and business rules change. Procedural graphs eliminate manual maintenance by continuously learning from trajectory histories:</p>
+        <ul>
+          <li><strong>Differential Trajectory Analysis:</strong> A dedicated offline refiner compares successful execution traces against failed trajectories, pinpointing exact nodes where execution diverged, prerequisites were omitted, or transitions dead-ended.</li>
+          <li><strong>Gated Validation Harness:</strong> Structural graph updates (adding nodes, altering prerequisite edge attributes) are never pushed directly to production. Candidate topologies are evaluated against a held-out test suite. Only modifications that maintain or increase benchmark success rates are merged.</li>
+          <li><strong>Rejection Memory:</strong> Modifications that degrade benchmark performance are logged to an immutable exclusion register, preventing the system from ever re-attempting counterproductive graph refactorings.</li>
+        </ul>
 
-      <h3>3. Progressive Bootstrapping from Incomplete Priors</h3>
-      <p>Building comprehensive workflow graphs by hand across complex enterprise systems is practically impossible. Procedural graphs overcome the cold-start problem through progressive refinement.</p>
-      <p>Engineering teams only need to provide a skeletal, high-level path of primary milestones. As the autonomous agent encounters failures during routine execution, the refiner automatically diagnoses omissions, adds missing prerequisite verification nodes, inserts error-recovery branches, and refines the topological ontology autonomously.</p>
+        <h3>3. Progressive Bootstrapping from Incomplete Priors</h3>
+        <p>Building comprehensive workflow graphs by hand across complex enterprise systems is practically impossible. Procedural graphs overcome the cold-start problem through progressive refinement.</p>
+        <p>Engineering teams only need to provide a skeletal, high-level path of primary milestones. As the autonomous agent encounters failures during routine execution, the refiner automatically diagnoses omissions, adds missing prerequisite verification nodes, inserts error-recovery branches, and refines the topological ontology autonomously.</p>
 
-      <h2>Implementing a Minimal Procedural Graph Runtime</h2>
+        <h2>Implementing a Minimal Procedural Graph Runtime</h2>
 
-      <p>The following Python pattern illustrates how local subgraph extraction dynamically generates structured priors for an agent execution loop:</p>
+        <p>The following Python pattern illustrates how local subgraph extraction dynamically generates structured priors for an agent execution loop:</p>
 
-      <pre><code>from typing import Dict, List, Optional
+        <pre><code>from typing import Dict, List, Optional
 from dataclasses import dataclass
 
 @dataclass
@@ -343,7 +501,7 @@ class ProceduralGraphRuntime:
             f"[UNMET PREREQUISITES]: {', '.join(unmet_prereqs) if unmet_prereqs else 'None (Ready)'}",
             f"[RECOMMENDED NEXT ACTIONS]: {', '.join(current.allowed_transitions)}"
         ]
-        return "\n".join(guidance)
+        return "\\n".join(guidance)
 
     def transition(self, action_name: str, next_node_id: str) -> bool:
         if next_node_id not in self.nodes:
@@ -352,32 +510,37 @@ class ProceduralGraphRuntime:
         self.current_node_id = next_node_id
         return True</code></pre>
 
-      <h2>The Paradigm Shift: From Memory Expansion to Action Topology</h2>
+        <h2>The Paradigm Shift: From Memory Expansion to Action Topology</h2>
 
-      <p>Scaling AI systems from passive conversational assistants into dependable operational agents requires a clear boundary between declarative recollection and procedural coordination. Expanding context windows and scaling semantic embedding stores are indispensable for informational retrieval, but they cannot replace executable topological structure.</p>
+        <p>Scaling AI systems from passive conversational assistants into dependable operational agents requires a clear boundary between declarative recollection and procedural coordination. Expanding context windows and scaling semantic embedding stores are indispensable for informational retrieval, but they cannot replace executable topological structure.</p>
 
-      <p>By decoupling procedural knowledge from transient conversational logs, engineering teams can build autonomous agents that possess both runtime resilience and strict operational integrity.</p>
-
-      <hr>
-
-      <section>
-        <h3>Sources</h3>
-        <ol>
-          <li><a href="https://arxiv.org/abs/2609.09153" target="_blank">Procedural Graphs: Self-Evolving Execution Structures for LLM Agents</a> — Research Paper, September 2026.</li>
-          <li><a href="https://mail.google.com/mail/u/0/#inbox/1a0aa9b08d630af3" target="_blank">Why Memory Isn't Enough: Structuring AI Agents with Procedural Graphs</a> — Gmail Source Record, September 2026.</li>
-        </ol>
-      </section>
-
-      <div class="publishing-pack">
-        <span class="verdict-badge">VERDICT: ✅ GO</span>
-        <h3>Publishing Pack</h3>
-        <p><strong>SEO Title:</strong> Why Memory Isn't Enough: Procedural Graphs for AI Agents</p>
-        <p><strong>Meta Description:</strong> Discover why vector memory and large context windows fail on complex workflows and how self-evolving procedural graphs solve long-horizon AI agent reliability.</p>
-        <p><strong>Slug:</strong> <code>procedural-graphs-ai-agent-architecture</code></p>
-        <p><strong>Tags:</strong> AI Agents, Procedural Graphs, LLM Architecture, Machine Learning, Autonomous Workflows</p>
-        <p><strong>Hero Image Alt:</strong> Architectural comparison between declarative knowledge graphs and executable procedural graphs for autonomous LLM agents.</p>
+        <p>As detailed in recent research on <a href="https://arxiv.org/abs/2609.09153" target="_blank">self-evolving procedural execution</a>, decoupling procedural knowledge from transient conversational logs allows engineering teams to build autonomous agents that possess both runtime resilience and strict operational integrity.</p>
       </div>
-    </main>
+
+      <div class="article-footer">
+        <div class="tag-list">
+          <span class="tag">AI Agents</span>
+          <span class="tag">Procedural Graphs</span>
+          <span class="tag">LLM Architecture</span>
+          <span class="tag">Systems Engineering</span>
+        </div>
+
+        <a href="../index.html" class="btn-return">&larr; Back to all publications</a>
+      </div>
+    </article>
+
+    <!-- Site Footer -->
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <div>
+          &copy; 2026 TinyBrain Blog. Built for modern AI systems engineering.
+        </div>
+        <div class="footer-links">
+          <a href="../index.html">Home</a>
+          <a href="https://github.com/kuldeepz/TinyBrainBlog" target="_blank">Repository</a>
+        </div>
+      </div>
+    </footer>
   </div>
 </body>
 </html>
