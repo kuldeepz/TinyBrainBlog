@@ -1,0 +1,364 @@
+---
+layout: post
+title: "From SDLC to ADLC: How Agentic Systems Rebuild the Software Lifecycle"
+description: "It’s September 2026, and the question for software leaders is no longer whether AI can help developers type faster. The strategic decision is whether your deve…"
+date: 2026-09-18
+categories: [ai, technology]
+tags: ["ai", "from"]
+---
+
+<p>It’s September 2026, and the question for software leaders is no longer whether AI can help developers type faster. The strategic decision is whether your development process itself can operate as an agentic, continuously improving system. The patterns that emerged through late 2024—agents that understand repositories, respond to production signals, propose plans, make changes, and run through executable gates—have coalesced into a practical alternative to the linear, human-handoff Software Development Lifecycle (SDLC). This Agentic Development Lifecycle (ADLC) is continuous, artifact-driven, and built to be executed by software agents. If you are redesigning delivery pipelines for reliability, auditability, and speed—without sacrificing safety—this matters now.</p>
+<p><img alt="Flowchart: from sdlc to adlc" src="/assets/images/from-sdlc-to-adlc-how-agentic-systems-rebuild-the-software-lifecycle-diagram.png"></p>
+<h2 id="background-from-sdlc-to-adlc">Background: From SDLC to ADLC</h2>
+<p>Traditional SDLC is linear by design. Requirements and planning flow into architecture and design, then implementation, testing, release, and monitoring. Transitions between stages depend on human handoffs. That structure enforces discipline, aligns stakeholders, and localizes risk. But the trade-offs are visible—queues between roles, coordination overhead, and delayed feedback from production.</p>
+<p>ADLC is organized as a continuous loop centered on artifacts and executable checks. The core phases are:</p>
+<ul>
+<li>Capture intent</li>
+<li>Requirements and design with the agent</li>
+<li>Agent builds with context and skills</li>
+<li>Agentic review and executable gates</li>
+<li>Continuous evaluations (closed-loop improvement)</li>
+</ul>
+<p>Two principles distinguish ADLC:</p>
+<ul>
+<li>Artifact-in → agent works artifact out. Every step is grounded in durable artifacts (intent, spec, plan, review record, code/tests). Agents consume and produce these artifacts, creating a chain of commits that doubles as an audit trail.</li>
+<li>Production signals create new intent. Incidents, metrics, and security findings feed directly into new “intent” that the system can execute—starting new loops without a human coordinator.</li>
+</ul>
+<p>Through late 2024, this pattern moved from whiteboard to production. Repo-aware agents and CI/CD-integrated tooling proposed plans and diffs, opened pull requests, and iterated based on test outcomes and policy checks. Platform moves across IDEs, code hosts, security scanners, and agent frameworks reinforced the same lifecycle seams and governance model. The result is a credible alternative to handoff-heavy SDLC, especially for work that can be scoped, validated, and deployed via automated gates.</p>
+<h2 id="current-state-capabilities-that-make-adlc-viable">Current State: Capabilities That Make ADLC Viable</h2>
+<p>Multiple threads converged to make ADLC workflows operational. Together they established the seams, tools, and governance needed to run closed-loop development as software.</p>
+<h3 id="capturing-intent-from-humans-and-production-signals">Capturing intent from humans and production signals</h3>
+<ul>
+<li>
+<p>Issue-to-plan agents. Tools such as GitHub Copilot Workspace (announced in 2024 with a limited rollout) generated plans/specs and proposed changes starting from an issue or brief intent, walking toward a PR with rationale. Atlassian’s AI features in Jira and Confluence drafted tickets and acceptance criteria from minimal prompts or existing documents. Linear and Notion’s AI-assisted drafting turned loose descriptions into actionable tasks/docs—effectively “intent.md” and “spec.md” precursors inside real backlogs and knowledge bases.</p>
+</li>
+<li>
+<p>Production signals to tickets/PRs. Sentry’s Autofix (beta in 2024) used LLMs to propose and sometimes implement fixes for production errors and integrated with CI to open PRs. GitHub Advanced Security with Copilot AutoFix suggested code changes for CodeQL security findings as PRs. APM/observability vendors (Datadog, New Relic, PagerDuty) shipped AI assistants that summarized incidents and drafted follow-ups or postmortems, which often became the seed for new “intent” artifacts.</p>
+</li>
+</ul>
+<p>The net effect: new intent originates where the signal happens, whether authored by humans or emitted by production systems.</p>
+<h3 id="requirements-and-design-with-the-agent-driven-by-artifacts">Requirements and design with the agent, driven by artifacts</h3>
+<ul>
+<li>
+<p>Agent-generated specs and designs. Repo-aware agents in GitHub Copilot Workspace, Sourcegraph Cody, and Cursor produced structured plans/specs tied to code references. Anthropic’s Claude 3.5-era “Artifacts” introduced a first-class way to create and refine persistent files (design docs, specs, code) inside a chat UI, reinforcing the “artifact-in/artifact-out” loop and lowering friction for generating intent/spec/plan files.</p>
+</li>
+<li>
+<p>Long-context design review. Long-context models made whole-repo reasoning more reliable. Gemini 1.5’s 1M-token context made it feasible to ingest large repos and architecture docs in one session. The Claude 3 family (later 3.5 Sonnet) combined large context windows with strong code comprehension to produce accurate, repo-scoped design artifacts.</p>
+</li>
+<li>
+<p>Policy encoded as skills. Guardrails frameworks (e.g., NVIDIA NeMo Guardrails, Llama Guard 2), DSPy, JSON Schema/Pydantic structured output, and custom validators matured into practical ways to encode organizational policy as executable constraints for spec/design generation. The guiding idea: requirements are not just prose; they are schemas and validator sets that agents must satisfy.</p>
+</li>
+</ul>
+<h3 id="building-with-context-and-skills-at-repo-scale">Building with context and skills at repo scale</h3>
+<ul>
+<li>
+<p>Repo-scale coding assistants. Cursor, Windsurf (Codeium), Sourcegraph Cody, JetBrains AI Assistant, and VS Code/GitHub Copilot integrations supported multi-file refactors, test generation, PR creation, and code search–grounded edits across large repositories. Open-source CLI tools like aider and Continue popularized artifact-first workflows—where the model reads repo docs such as CLAUDE.md or CONTRIBUTING.md and produces minimal diffs with traceable context.</p>
+</li>
+<li>
+<p>Orchestrating multi-agent, stateful work. LangGraph (LangChain) introduced graph-based, checkpointed agent workflows that survive restarts and coordinate planning/build/test loops—useful for ADLC pipelines that must be robust to intermittent failures. Microsoft’s AutoGen 2, LlamaIndex agents, CrewAI, Semantic Kernel, and OpenAI’s “Swarm” examples encouraged splitting planning, coding, testing, and review into specialized roles with shared state.</p>
+</li>
+<li>
+<p>Tool use and computer control. Anthropic’s “Computer Use” (2024) enabled agents to operate apps/browsers/terminals in a controlled VNC-like environment. OpenAI’s GPT-4o Realtime and the macOS desktop app added screen/keyboard control patterns. Teams combined these with sandboxes (e2b, ephemeral containers) so agents could run builds/tests safely, interact with devtools, and collect evidence for reviews.</p>
+</li>
+</ul>
+<h3 id="agentic-review-and-executable-gates-governance-as-code">Agentic review and executable gates: Governance as code</h3>
+<ul>
+<li>
+<p>AI code review shifted from hints to policies. GitHub, GitLab (Duo), JetBrains, and Sourcegraph shipped AI review comments, risk spotting, and PR summaries that increasingly cited diffs and tests and linked to policy docs. The goal was not to replace reviewers but to frontload risk detection and summarize impact.</p>
+</li>
+<li>
+<p>Gates as hooks, not habits. Policy-as-code via OPA/Conftest, Code Owners, static analysis, license checks, secret scanners, and test coverage gates formalized the “executable governance” layer. Safety and format guardrails (NeMo Guardrails, Llama Guard 2, Pydantic validators) began to run in CI as hard checks on model outputs for applicable artifacts (configuration files, JSON, documentation formats). Agents had to pass these checks before merge.</p>
+</li>
+</ul>
+<h3 id="continuous-evaluations-closed-loop-improvement">Continuous evaluations (closed-loop improvement)</h3>
+<ul>
+<li>
+<p>Evals and tracing became standard. LangSmith, Langfuse, Weights &amp; Biases Weave, Arize Phoenix, PromptLayer, and Confident AI’s DeepEval enabled teams to store traces, run regression evals, A/B models/tools, and correlate tool calls and outputs—creating the audit trail the ADLC loop expects.</p>
+</li>
+<li>
+<p>Task-aligned evals. RAG/code-eval frameworks (Ragas, promptfoo, OpenAI Evals) and unit/integration tests were wired into agent loops to guide iterative fixes. Benchmarks shifted from token-level metrics to real-world tasks: SWE-bench and SWE-bench Verified became reference benchmarks for “file a patch that passes tests,” with specialized agentic systems moving from low single digits to low double-digit solve rates by late 2024—still far from human engineers and variable across repos. For system-control tasks, WebArena, BrowserGym, and OSWorld-like benchmarks measured reliability of multi-step computer use.</p>
+</li>
+</ul>
+<h3 id="model-capabilities-that-unlocked-longer-safer-loops">Model capabilities that unlocked longer, safer loops</h3>
+<ul>
+<li>
+<p>Reasoning and reliability improved. OpenAI’s o1 models (announced September 2024) significantly improved multi-step problem solving and code reasoning versus prior GPT-4-class models, reducing brittle tool-call chains for some tasks.</p>
+</li>
+<li>
+<p>Long context and repo understanding matured. Gemini 1.5’s million-token context and “files mode” made whole-repo reading and cross-file consistency more plausible. Claude 3/3.5 models offered strong code comprehension and long-context editing.</p>
+</li>
+<li>
+<p>Code-specialized open models advanced. Qwen2.5-Coder, DeepSeek-Coder V2, Codestral, and StarCoder2 raised the quality of open-source code generation. Teams ran them in on-prem pipelines for privacy/compliance, often coupled with retrieval over code graphs.</p>
+</li>
+</ul>
+<h3 id="patterns-that-feel-like-adlc">Patterns that feel like ADLC</h3>
+<ul>
+<li>
+<p>Artifact-first development. Claude “Artifacts” and IDE agents that generate intent.md/spec.md/plan.md reinforced the artifact chain and auditability. Many teams created repo-resident CLAUDE.md/AI.md files to encode institutional style and policy for agents.</p>
+</li>
+<li>
+<p>Checkpointed multi-agent DAGs. LangGraph’s persistence and node-level retries made long-running build/test/fix loops robust and auditable—crucial for “agent works artifact out” lifecycles with a chain of commits.</p>
+</li>
+<li>
+<p>Safe execution by default. e2b sandboxes, ephemeral containers (Docker/Kubernetes), and strict credential boundaries became best practice so agents can run tests/builds without production blast radius.</p>
+</li>
+</ul>
+<h3 id="enterprise-platforms-moved-toward-adlc">Enterprise platforms moved toward ADLC</h3>
+<ul>
+<li>
+<p>GitHub evolved from autocomplete to “propose, implement, justify.” Copilot Enterprise PR features (summaries, suggested tests), Copilot Workspace (plan-to-PR), and Code Scanning Autofix increased CI hooks and PR automations.</p>
+</li>
+<li>
+<p>GitLab integrated Duo for code suggestions and reviews and explain/remediate flows for vulnerabilities, all tied into MRs and pipelines.</p>
+</li>
+<li>
+<p>JetBrains delivered AI Assistant across IDEs with context-aware refactorings, test generation, and PR review support.</p>
+</li>
+<li>
+<p>Cloud providers packaged CI/CD-integrated agents. Google Cloud positioned Gemini Code Assist and Vertex AI Agents patterns for enterprise pipelines. AWS Bedrock Guardrails and CodeWhisperer integrated with CodeGuru Security for explain/fix loops. Azure’s model catalog with Prompt Flow/AI Studio facilitated evals, traceability, and CI integration.</p>
+</li>
+</ul>
+<h3 id="evaluation-governance-and-auditability-matured">Evaluation, governance, and auditability matured</h3>
+<ul>
+<li>
+<p>Standardized traces. Teams increasingly logged agent tool calls, intermediate scratchpads (when allowed), and artifacts to tracing platforms (LangSmith/Langfuse/Weave). This formed the “review record” and enabled rollbacks and replays.</p>
+</li>
+<li>
+<p>Policy-as-code rose to first-class. OPA/Conftest policies and org-specific lint/test rules embodied “executable governance,” with humans reserved for critical code paths and high-risk repos.</p>
+</li>
+<li>
+<p>Security and safety constraints tightened. Llama Guard 2, Bedrock Guardrails, NeMo Guardrails, and prompt-injection detectors guarded repo/tool interactions. Supply-chain scanning (SBOMs, dependency updates) increasingly paired with agentic PRs (Dependabot + AI summaries/fixes).</p>
+</li>
+</ul>
+<h2 id="the-artifact-chain-audit-by-construction">The Artifact Chain: Audit by Construction</h2>
+<p>The strongest element of the ADLC is the artifact chain. Each loop produces a sequence of concrete, versioned files and commits:</p>
+<ul>
+<li>intent.md: captures new intent (from a human author or a production signal)</li>
+<li>spec.md: design and approach aligned with the repo and policies</li>
+<li>plan.md: executable implementation plan (files to change, tests to add, migration steps)</li>
+<li>code and tests: minimal diffs with references back to spec/plan</li>
+<li>review record: approvals, automated gate outcomes, and rationale</li>
+<li>production signal: incident/metrics that feed back into new intent</li>
+</ul>
+<p>Because these artifacts live in the repository and CI/CD trace stores, the chain of commits becomes the audit trail. It enables traceability from a production event to a change, to the tests and policies that justified it, to the deploy and its effects. It also lets safety controls run as hooks rather than habits: instead of relying on a reviewer to remember a checklist, validator schemas, OPA policies, Code Owners, license scanners, and coverage thresholds execute automatically. Humans review where judgment is essential (e.g., critical code paths, schema migrations, cryptography), and agents handle the rest.</p>
+<p>Practical benefits:</p>
+<ul>
+<li>Transparency. You can inspect intent/spec/plan diffs like code. You can replay agent runs from traces.</li>
+<li>Accountability. Every merge carries a review record with gate outcomes and links to rationale.</li>
+<li>Reusability. Institutional knowledge becomes files (CLAUDE.md, AI.md, CONTRIBUTING.md), validator libraries, and prompts—portable and improvable over time.</li>
+<li>Compliance. Auditors can see how policies are encoded and enforced in CI, with logs for each run.</li>
+</ul>
+<h2 id="a-worked-example-your-first-adlc-pipeline">A Worked Example: Your First ADLC Pipeline</h2>
+<p>Here is an end-to-end ADLC pipeline that implements the “artifact-in → agent works artifact out” loop using tools available by late 2024.</p>
+<p>1) Sources of intent</p>
+<ul>
+<li>
+<p>Human-authored intent. Engineers or product managers use an IDE agent or knowledge tool to draft intent.md: a short problem statement, constraints, and success criteria. A repo-resident template and schema (Pydantic/JSON Schema) enforce structure.</p>
+</li>
+<li>
+<p>Production signals originate intent. Sentry Autofix or APM assistants file incidents with suggested root causes. GitHub Advanced Security produces CodeQL findings. A webhook translates these into intent.md with the right schema (linking to stack traces or findings), stored in a branch.</p>
+</li>
+</ul>
+<p>2) Requirements and design with the agent</p>
+<ul>
+<li>
+<p>Spec generation. A repo-aware agent (e.g., Cody/Cursor/Copilot Workspace) takes intent.md and produces spec.md with references to the relevant files and APIs. The agent operates in a long-context session (Gemini 1.5, Claude 3/3.5 class) so it can quote the current implementation and cite constraints from CLAUDE.md/CONTRIBUTING.md.</p>
+</li>
+<li>
+<p>Policy as skills. The spec passes through validators: JSON schema for required sections, link checkers for cited code paths, and custom policy checks (e.g., “no direct DB writes in service X”). Guardrails frameworks enforce format and safety requirements at generation-time; spec.md is only committed if validators pass.</p>
+</li>
+</ul>
+<p>3) Planning</p>
+<ul>
+<li>
+<p>Plan generation. The agent generates plan.md: a step-by-step implementation plan with file-level diffs to target, new tests to add, and migration/rollback steps. It also includes CI considerations (e.g., feature flags, performance budgets to measure).</p>
+</li>
+<li>
+<p>Executable gates. plan.md is validated to ensure it references tests and adds rollback plans for stateful changes. OPA policies enforce that certain repo areas require human approval at the plan stage (e.g., encoding Code Owners thresholds).</p>
+</li>
+</ul>
+<p>4) Build and test in a sandbox</p>
+<ul>
+<li>
+<p>Environment setup. The orchestrator (LangGraph) spins up an ephemeral container with a hermetic build (locked dependencies, golden images). Credentials are least-privilege and bounded to the sandbox.</p>
+</li>
+<li>
+<p>Implementation. A code-generation agent applies minimal diffs aligned to plan.md, citing references in commit messages. aider/Continue-style workflows keep diffs small and traceable.</p>
+</li>
+<li>
+<p>Tests and evidence. The agent writes tests as specified, runs them, and collects artifacts (logs, coverage reports). It also runs static analysis, secret scans, and license checks locally and stores results in trace logs.</p>
+</li>
+<li>
+<p>Resilience. LangGraph checkpoints after each step (plan applied, tests written, tests passed), allowing retries where flakiness occurs. Failures trigger an automatic fix loop: analyze output, update plan.md if needed, propose a new diff.</p>
+</li>
+</ul>
+<p>5) Agentic review and governance gates</p>
+<ul>
+<li>
+<p>Automated PR. The orchestrator opens a PR with a summary linking intent.md, spec.md, plan.md, and evidence (test results, coverage, static analysis outcomes). The summary also includes risk annotations (e.g., touched critical files).</p>
+</li>
+<li>
+<p>AI review assist. AI reviewers (GitHub/GitLab/JetBrains/Sourcegraph) generate comments citing diffs and policy references. If configured, they suggest additional tests.</p>
+</li>
+<li>
+<p>Executable gates in CI. CI runs test suites, coverage thresholds, static analysis, license and secret scans, SBOM checks, and policy-as-code rules (OPA/Conftest). Safety/format guardrails validate generated artifacts (e.g., JSON config files) as hard checks. Only green PRs can merge; violations block until fixed.</p>
+</li>
+<li>
+<p>Human judgment where required. Code Owners enforce human review for critical paths. The PR template surfaces exactly where judgment is needed (e.g., data migrations), and the rest is machine-verified.</p>
+</li>
+</ul>
+<p>6) Deploy and observe</p>
+<ul>
+<li>
+<p>Merge and rollout. On merge, deploy proceeds via standard pipelines. Plan.md includes rollout and rollback strategies; the orchestrator tracks which step is live.</p>
+</li>
+<li>
+<p>Review record. The system stores a “review record” artifact summarizing gates passed, human approvals, and deploy metadata. Traces (LangSmith/Langfuse/Weave) persist tool calls and intermediate artifacts for replay.</p>
+</li>
+</ul>
+<p>7) Continuous evals and feedback</p>
+<ul>
+<li>
+<p>Evals in CI. Regression evals (promptfoo, RAG evals for RAG services, DeepEval) run on every loop to catch behavior drift. Results are logged and trended.</p>
+</li>
+<li>
+<p>Production signals feed back. Incidents, anomalies, and metrics (APM/Sentry/security) automatically generate new intent.md to start the next loop. Dependabot-like supply-chain updates, augmented by AI summaries, create safe update PRs routed through the same gates.</p>
+</li>
+</ul>
+<p>The “secret sauce” is not a single model—it is the combination of:</p>
+<ul>
+<li>Durable artifacts with schemas</li>
+<li>Repo-aware agents operating in long context</li>
+<li>Checkpointed orchestration with sandboxed execution</li>
+<li>Policy-as-code enforced in CI</li>
+<li>Comprehensive tracing and evals</li>
+</ul>
+<h3 id="design-choices-and-trade-offs">Design choices and trade-offs</h3>
+<ul>
+<li>
+<p>Where to place humans. Reserve human review for high-risk code and irreversible state changes. Let executable gates and AI review assist handle the bulk.</p>
+</li>
+<li>
+<p>How to encode institutional knowledge. Centralize conventions in CLAUDE.md/AI.md/CONTRIBUTING.md and validators. Keep them versioned, reviewed, and enforced by gates.</p>
+</li>
+<li>
+<p>How to stabilize environments. Invest in hermetic builds, deterministic test suites, and golden images. Many agent failures traced to dependency hell and flaky tests; controlling environment variance pays off.</p>
+</li>
+<li>
+<p>How to bound risk. Run agents in sandboxes (e2b, ephemeral containers) with least-privilege credentials. Use prompt-injection detectors and scan inputs from repos/logs. Tie supply-chain scanners and SBOMs to agentic PRs.</p>
+</li>
+<li>
+<p>How to manage cost/latency. Repo-scale context and iterative loops can be expensive. Cache embeddings and code graphs; use selective retrieval and minimal-diff strategies. Gate when to invoke long-context models versus fast, specialized ones.</p>
+</li>
+<li>
+<p>How to measure progress. Beyond unit tests, adopt internal goldens for your stack to reduce evaluation drift. Track loop-level metrics (plan-to-PR time, PR rework rate, gate failure distributions) and benchmark against task-suited baselines (e.g., SWE-bench-style internal suites).</p>
+</li>
+</ul>
+<h2 id="operational-risks-and-mitigations">Operational Risks and Mitigations</h2>
+<p>As of late 2024, the ADLC pattern was promising but imperfect. Recognizing and mitigating the gaps determines whether your pipeline is robust.</p>
+<ul>
+<li>
+<p>Reliability and variance. Even strong models failed intermittently on long, stateful loops. Checkpoints, retries, and tight test scaffolding reduced risk. Orchestrators with persistence (e.g., LangGraph) made loops resumable and auditable.</p>
+</li>
+<li>
+<p>Environment setup and reproducibility. Agents struggled with dependency issues, nondeterministic builds, and flaky CI. Hermetic builds, golden images, and deterministic test seeds were necessary.</p>
+</li>
+<li>
+<p>Security and data exfiltration. Tool-enabled agents were vulnerable to prompt injection via code/comments/logs and to credential mishandling. Enforce least-privilege credentials, network egress controls in sandboxes, and content scanning on model inputs. Keep secret scanning in gates and scrub traces of sensitive data.</p>
+</li>
+<li>
+<p>Cost and latency. Long context windows and multi-iteration loops were expensive. Caching, retrieval over code graphs, and scoping changes to minimal diffs kept costs in check.</p>
+</li>
+<li>
+<p>Evaluation drift. Lack of unified, domain-specific eval suites made continuous evals hard. Many teams built internal goldens tailored to their services and libraries; keep them versioned and run them in CI to catch regressions.</p>
+</li>
+<li>
+<p>Capability limits. On SWE-bench and SWE-bench Verified, end-to-end “file a patch that passes tests” results reached low double digits for specialized systems by late 2024—far from expert engineers and highly variable across repos. Confine agent autonomy to well-gated, well-tested slices of work, and grow scope as reliability improves. For computer-use tasks (WebArena/BrowserGym/OSWorld-style), expect brittleness in complex UIs and multistep configurations; keep critical operations out of band or behind heavier supervision.</p>
+</li>
+</ul>
+<h2 id="measuring-success-task-aligned-metrics">Measuring Success: Task-Aligned Metrics</h2>
+<p>Because ADLC reorganizes how work flows, choose metrics that assess the loop, not just individual steps.</p>
+<ul>
+<li>Lead time from intent to merged PR, broken down by plan, build, gate, and review stages.</li>
+<li>Gate failure rate distribution (tests, coverage, security, policy) and time-to-fix—signals of governance health.</li>
+<li>Ratio of human-reviewed lines in critical code versus total lines changed—indicates whether judgment lands where it matters.</li>
+<li>Revert/rollback rates and mean time to restore after deploys associated with agentic changes—guardrails effectiveness.</li>
+<li>Evals pass rates on internal goldens for agent behaviors (prompt stability, code edit safety) across model/tool versions—resilience to drift.</li>
+<li>Audit completeness: percentage of merged changes with a complete artifact chain (intent.md, spec.md, plan.md, review record)—traceability health.</li>
+</ul>
+<p>Benchmark externally for calibration but instrument internally for decisions. Public benchmarks (SWE-bench, WebArena, etc.) provide a floor and a trend, not a verdict on your stack.</p>
+<h2 id="organizational-shifts-from-committees-to-encoded-policy">Organizational Shifts: From Committees to Encoded Policy</h2>
+<p>ADLC is not just tooling—it is governance as code and culture as artifacts.</p>
+<ul>
+<li>
+<p>Replace ad hoc checklists with policy-as-code. OPA/Conftest and validator schemas codify expectations. Keep policies in-repo, versioned, and subject to the same review protocols as code.</p>
+</li>
+<li>
+<p>Treat artifacts as first-class. Maintain templates and schemas for intent/spec/plan/review record. Review and evolve them like an API contract.</p>
+</li>
+<li>
+<p>Create a platform team for agentic pipelines. Centralize model selection, sandboxing standards, tracing/evals infrastructure, and security controls. Offer paved paths: standard LangGraph DAGs, gate configurations, and CLAUDE.md conventions.</p>
+</li>
+<li>
+<p>Scope human judgment deliberately. Define which repos, directories, or tags trigger mandatory human sign-off. Calibrate over time as gates and tests earn trust.</p>
+</li>
+<li>
+<p>Invest in testability. ADLC thrives where tests are comprehensive, fast, and meaningful. Improving test coverage and determinism pays dividends across the loop.</p>
+</li>
+<li>
+<p>Prepare for audits. Decide what to log (tool calls, intermediate artifacts) and how to protect sensitive data. Establish retention and replay policies.</p>
+</li>
+</ul>
+<h2 id="practical-playbook-selecting-tools-for-each-adlc-stage">Practical Playbook: Selecting Tools for Each ADLC Stage</h2>
+<p>A reference mapping aligned to capabilities available through late 2024:</p>
+<ul>
+<li>
+<p>Capture intent: APM/Sentry assistants for production signals; GitHub Advanced Security + Autofix for CodeQL findings; Jira/Confluence AI, Linear/Notion AI for human-authored intent.</p>
+</li>
+<li>
+<p>Requirements/design: Repo-aware agents (Cody, Cursor, Copilot Workspace); long-context models (Gemini 1.5, Claude 3/3.5); Claude Artifacts for collaborative authoring; guardrails (NeMo Guardrails, Llama Guard 2) plus JSON Schema/Pydantic validators.</p>
+</li>
+<li>
+<p>Build: IDE assistants (Cursor, Windsurf, JetBrains AI, Copilot); aider/Continue for artifact-first diffs; orchestration with LangGraph (checkpointed DAGs); sandboxes (e2b, ephemeral containers); computer use where appropriate.</p>
+</li>
+<li>
+<p>Review/gates: AI review across GitHub/GitLab/JetBrains/Sourcegraph; CI gates with tests, coverage, static analysis, license/secret scanning; OPA/Conftest policy enforcement; Code Owners for human-judged paths.</p>
+</li>
+<li>
+<p>Continuous evals: Tracing (LangSmith, Langfuse, Weave, Phoenix, PromptLayer); eval frameworks (promptfoo, Ragas, DeepEval, OpenAI Evals); internal goldens tailored to your stack.</p>
+</li>
+<li>
+<p>Models: o1 for multi-step reasoning; Gemini 1.5/Claude 3.5 for long-context code comprehension; open code models (Qwen2.5-Coder, DeepSeek-Coder V2, Codestral, StarCoder2) for on-prem pipelines with retrieval over code graphs.</p>
+</li>
+<li>
+<p>Governance and safety: Prompt-injection detectors; supply-chain scanners and SBOM generation; Bedrock Guardrails where applicable.</p>
+</li>
+</ul>
+<p>This layering reinforces a core principle: the agent is only as effective as the gates and artifacts you give it. Start with the smallest, safest slice—bug fixes in a well-tested service—and expand scope as your gates and evaluators prove reliable.</p>
+<h2 id="why-this-matters-now">Why This Matters Now</h2>
+<p>By late 2024, the building blocks for ADLC were credible: repo-aware agents, long-context models, CI-integrated gates, and trace/eval infrastructure. The intervening time has been about integration and scale—turning patterns into platforms and practices inside organizations. Today, the cost of not moving is visible in queues between roles, slow incident response, and compliance burdens that still require manual artifact collection. ADLC reduces latency from signal to safe change while increasing auditability, provided you invest upfront in encoding policy and strengthening tests.</p>
+<p>Put simply: SDLC optimizes for control through human coordination; ADLC optimizes for control through executable policy, with humans applying judgment at the seams that require it. If you are under pressure to ship faster without letting safety slip, treat ADLC as a deliberate design choice, not a side experiment.</p>
+<h2 id="outlook-what-will-make-adlc-the-default">Outlook: What Will Make ADLC the Default</h2>
+<p>Several trends, already underway by late 2024, point to how ADLC will strengthen:</p>
+<ul>
+<li>
+<p>More robust computer use. As agents become more reliable at operating UIs, terminals, and cloud consoles within sandboxes, more of the “last-mile” operational steps can be folded into the loop—still gated by policy-as-code.</p>
+</li>
+<li>
+<p>Standard audit logs for agents. Tracing formats and APIs will converge, making it easier to aggregate tool calls, artifacts, and gate outcomes across platforms and vendors into a single “review record.”</p>
+</li>
+<li>
+<p>Better domain-specific evals. Organizations will continue to build internal goldens tailored to their services. Expect frameworks to make it easier to define, run, and trend these evals as first-class CI jobs.</p>
+</li>
+<li>
+<p>Stronger policy compilers. Higher-level policy languages that compile to OPA/Conftest and validator schemas will reduce the friction of encoding institutional knowledge and make policies portable across services.</p>
+</li>
+<li>
+<p>Model portfolios and routing. Teams will standardize on a portfolio (reasoning, long-context, code-specialized open models) with routers that select the right tool for each step—balancing cost, privacy, and capability.</p>
+</li>
+<li>
+<p>Safer defaults. Paved-path sandboxes, hermetic build images, and minimal-privilege credentials will become table stakes for agentic execution.</p>
+</li>
+</ul>
+<p>The open problems are equally clear: eliminating flakiness in long loops, tightening security against prompt injection and data exfiltration, making evals predictive of production reliability, and proving the ROI against your baseline. Those are engineering problems with known paths. The bigger shift is managerial: recasting process as software, with policies and artifacts under version control and gates that do not tire.</p>
+<p>If you take one step this quarter, make it this: define your artifact chain and the gates that make each artifact trustworthy. Create intent.md, spec.md, plan.md, and review record templates with schemas and validators; wire them to your CI. Once you have artifacts and gates, adding agents becomes a controlled evolution, not a leap of faith. That is the heart of moving from SDLC to ADLC.</p>
